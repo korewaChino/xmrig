@@ -95,8 +95,9 @@ COPY --from=xmrig /src/build/xmrig /xmrig/xmrig
 COPY --from=cuda /src/build /xmrig-cuda
 
 RUN <<EOF
+    ls -la /xmrig-cuda
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
-        cp -v /xmrig-cuda/*.so /xmrig/xmrig-cuda
+        cp -v /xmrig-cuda/*.so /xmrig/
     fi
 EOF
 
