@@ -1,0 +1,11 @@
+services:
+  xmrig:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: xmrig
+    container_name: xmrig
+    privileged: true
+    restart: unless-stopped
+    volumes:
+      - ./config.json:/root/.xmrig.json
