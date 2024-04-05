@@ -101,4 +101,4 @@ RUN <<EOF
 EOF
 
 
-ENTRYPOINT ["/usr/bin/xmrig"]
+ENTRYPOINT ["/xmrig/xmrig"]
