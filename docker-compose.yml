@@ -1,4 +1,14 @@
 services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "6060:7070"
+    networks:
+      - svc_net
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
   xmrig:
     build:
       context: .
@@ -8,5 +18,10 @@ services:
     container_name: xmrig
     privileged: true
     restart: unless-stopped
+    networks:
+      - svc_net
     volumes:
       - ./config.json:/root/.xmrig.json
+
+networks:
+  svc_net:

@@ -1,0 +1,6 @@
+:7070 {
+	reverse_proxy http://xmrig:6060
+
+	# rewrite /1/* to /2/*
+	rewrite /1/summary /2/summary
+}
