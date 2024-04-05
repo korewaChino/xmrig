@@ -16,4 +16,4 @@ RUN make -j$(nproc)
 
 RUN chmod +x ./xmrig
 
-CMD ["/src/build/xmrig"]
+ENTRYPOINT ["/src/build/xmrig"]
