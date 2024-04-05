@@ -42,6 +42,8 @@ EOF
 FROM base as cuda
 
 RUN git clone https://github.com/xmrig/xmrig-cuda.git /src
+
+
 WORKDIR /src
 
 RUN mkdir -p build
@@ -73,7 +75,7 @@ RUN <<EOF
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
         cmake .. -DWITH_CUDA=ON
     else
-        cmake -DWITH_CUDA=OFF ..
+        cmake .. -DWITH_CUDA=OFF ..
     fi
 EOF
 
@@ -83,9 +85,6 @@ RUN chmod +x ./xmrig
 
 FROM base as runtime
 
-RUN --mount=type=cache,target=/var/cache/dnf <<EOF
-    rpm -e --nodeps $DEPS_STD
-EOF
 
 RUN mkdir -p /xmrig
 
