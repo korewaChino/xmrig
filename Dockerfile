@@ -2,7 +2,7 @@
 
 FROM fedora:39 as base
 ENV DEPS_STD="dnf-plugin-ovl git make cmake gcc gcc-c++ g++ libstdc++-static libstdc++-devel libuv-static hwloc-devel openssl-devel automake libtool autoconf"
-ENV RUNTIME_DEPS="libuv hwloc openssl libstdc++"
+ENV RUNTIME_DEPS="libuv hwloc openssl"
 
 # Add a target platform argument to the build
 
@@ -11,20 +11,31 @@ ARG BUILDPLATFORM
 
 RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
 
+RUN --mount=type=cache,target=/var/cache/dnf \
+    dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
+    dnf-plugins-core
+
+# cache downloads first
+
 RUN --mount=type=cache,target=/var/cache/dnf <<EOF
     EXTRA_PKGS=""
-    dnf install -y dnf-plugins-core
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
         echo "Adding CUDA"
-        dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
         dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo
         dnf module disable -y nvidia-driver 
         export EXTRA_PKGS="cuda xorg-x11-drv-nvidia-cuda"
-
     fi
-    dnf install -y $RUNTIME_DEPS $DEPS_STD $EXTRA_PKGS
+    dnf install -y $RUNTIME_DEPS $DEPS_STD $EXTRA_PKGS --downloadonly
+EOF
 
-    dnf clean all
+# finally install
+
+RUN --mount=type=cache,target=/var/cache/dnf <<EOF
+    if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
+        dnf install -y $RUNTIME_DEPS $DEPS_STD cuda xorg-x11-drv-nvidia-cuda
+    else
+        dnf install -y $RUNTIME_DEPS $DEPS_STD
+    fi
 EOF
 
 
@@ -39,7 +50,7 @@ WORKDIR /src/build
 
 RUN <<EOF
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
-        cmake .. -DWITH_CUDA=ON
+        cmake ..
         make -j$(nproc)
     else
         echo "CUDA is not supported on $TARGETPLATFORM! Continuing anyway"
