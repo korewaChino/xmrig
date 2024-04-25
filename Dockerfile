@@ -37,6 +37,7 @@ RUN --mount=type=cache,target=/var/cache/dnf <<EOF
     fi
 EOF
 
+RUN dnf clean all
 
 FROM base as cuda
 
