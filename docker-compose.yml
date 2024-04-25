@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    runtime: nvidia
+    # runtime: nvidia
     image: ghcr.io/korewachino/xmrig:latest
     container_name: xmrig
     privileged: true
