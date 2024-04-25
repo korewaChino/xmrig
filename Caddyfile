@@ -3,4 +3,5 @@
 
 	# rewrite /1/* to /2/*
 	rewrite /1/summary /2/summary
+	rewrite /2/backends /2/backends # this is a no-op, weird hack to slow down the response so it sends the full thing?
 }
