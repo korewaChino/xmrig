@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: Dockerfile
     runtime: nvidia
-    image: xmrig
+    image: ghcr.io/korewachino/xmrig:latest
     container_name: xmrig
     privileged: true
     restart: unless-stopped
