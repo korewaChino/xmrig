@@ -92,6 +92,9 @@ WORKDIR /xmrig
 
 COPY --from=xmrig /src/build/xmrig /xmrig/xmrig
 
+# remove all development packages
+RUN dnf remove -y \*-devel
+
 COPY --from=cuda /src/build /xmrig-cuda
 
 RUN <<EOF
