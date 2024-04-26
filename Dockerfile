@@ -14,6 +14,8 @@ RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM" > /log
 RUN dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm \
     dnf-plugins-core
 
+ARG weakdep="--setopt=install_weak_deps=False"
+
 # cache downloads first
 
 RUN --mount=type=cache,target=/var/cache/dnf <<EOF
@@ -24,16 +26,16 @@ RUN --mount=type=cache,target=/var/cache/dnf <<EOF
         dnf module disable -y nvidia-driver 
         export EXTRA_PKGS="cuda xorg-x11-drv-nvidia-cuda"
     fi
-    dnf install -y $RUNTIME_DEPS $DEPS_STD $EXTRA_PKGS --downloadonly
+    dnf install -y $RUNTIME_DEPS $DEPS_STD $EXTRA_PKGS --downloadonly $weakdep
 EOF
 
 # finally install
 
 RUN --mount=type=cache,target=/var/cache/dnf <<EOF
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
-        dnf install -y $RUNTIME_DEPS $DEPS_STD cuda xorg-x11-drv-nvidia-cuda
+        dnf install -y $RUNTIME_DEPS $DEPS_STD cuda xorg-x11-drv-nvidia-cuda $weakdep
     else
-        dnf install -y $RUNTIME_DEPS $DEPS_STD
+        dnf install -y $RUNTIME_DEPS $DEPS_STD $weakdep
     fi
 EOF
 
