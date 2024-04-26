@@ -26,10 +26,19 @@ jobs:
           logout: false
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - name: Build
         uses: docker/build-push-action@v4
         with:
-          push: true
+          context: .
           platforms: linux/amd64
           tags: |
             ghcr.io/korewachino/xmrig:latest
+
+      - name: Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/korewachino/xmrig:latest
+          push: true

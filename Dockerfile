@@ -96,6 +96,8 @@ RUN rm -rfv /etc/dnf/protected.d/*
 
 RUN dnf remove -y $DEPS_STD
 
+RUN dnf remove xorg-x11-drv-nvidia-cuda cuda -y
+
 COPY --from=cuda /src/build /xmrig-cuda
 
 RUN --mount=type=cache,target=/var/cache/dnf <<EOF
