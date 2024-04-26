@@ -37,8 +37,6 @@ RUN --mount=type=cache,target=/var/cache/dnf <<EOF
     fi
 EOF
 
-RUN dnf clean all
-
 FROM base as cuda
 
 RUN git clone https://github.com/xmrig/xmrig-cuda.git /src
@@ -93,16 +91,24 @@ WORKDIR /xmrig
 COPY --from=xmrig /src/build/xmrig /xmrig/xmrig
 
 # remove all development packages
-RUN dnf remove -y \*-devel --skip-broken || true
+
+RUN rm -rfv /etc/dnf/protected.d/*
+
+RUN dnf remove -y $DEPS_STD
 
 COPY --from=cuda /src/build /xmrig-cuda
 
-RUN <<EOF
+RUN --mount=type=cache,target=/var/cache/dnf <<EOF
     ls -la /xmrig-cuda
     if [ "$TARGETPLATFORM" = "linux/amd64" ]; then
         cp -v /xmrig-cuda/*.so /xmrig/
+        export EXTRA_PKGS="xorg-x11-drv-nvidia-cuda-libs cuda-nvrtc-*"
+        dnf install -y $EXTRA_PKGS
+        ln -s /usr/local/cuda-12.4/targets/x86_64-linux/lib/libnvrtc.so.12 /usr/lib64/libnvrtc.so.12
     fi
 EOF
+
+RUN ln -s /xmrig/xmrig /usr/bin/xmrig
 
 
 ENTRYPOINT ["/xmrig/xmrig"]
