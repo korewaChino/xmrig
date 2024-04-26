@@ -36,11 +36,4 @@ jobs:
           platforms: linux/amd64
           tags: |
             ghcr.io/korewachino/xmrig:latest
-
-      - name: Push
-        uses: docker/build-push-action@v4
-        with:
-          platforms: linux/amd64
-          tags: |
-            ghcr.io/korewachino/xmrig:latest
           push: true
